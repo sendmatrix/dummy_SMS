@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Top Up - DUMMY SMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+    }
+    .fancy-header {
+      background: #c3d7f8;
+      color: white;
+      border-radius: 50px 50px 20px 20px;
+      padding: 20px;
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      border-bottom: 2px solid #00ff99;
+    }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    .header-logo { height: 40px; }
+    .header-title {
+      font-size: 24px;
+      margin: 0;
+      color: #3b82f6;
+    }
+    .header-bottom {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    .profile-info, .balance-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #1a1a1a;
+      padding: 6px 12px;
+      border-radius: 20px;
+      box-shadow: 0 0 10px #00ff99;
+      color: white;
+    }
+    .box {
+      max-width: 420px;
+      margin: auto;
+    }
+    input[type="number"] {
+      padding: 12px;
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .quick-buttons button {
+      padding: 10px 16px;
+      background: #e0ecff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #58B0C6;
+    }
+    .quick-buttons button:hover {
+      background: #58B0C6;
+      color: white;
+      transform: scale(1.05);
+    }
+    .warning, .success {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .warning { color: red; }
+    .success { color: green; }
+    .continue-btn {
+      margin-top: 20px;
+      padding: 14px;
+      background: #58B0C6;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      display: none;
+    }
+    .coin-selector {
+      margin-top: 14px;
+      font-weight: 600;
+      color: #475569;
+    }
+    .custom-select-wrapper {
+      position: relative;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px;
+      background: white;
+      margin-top: 8px;
+    }
+    .selected-option, .custom-options div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      padding: 6px;
+      cursor: pointer;
+    }
+    .selected-option img, .custom-options img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+    .custom-options {
+      display: none;
+      position: absolute;
+      top: 110%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .custom-options div:hover {
+      background: #e0f2fe;
+    }
+
+    #popupOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 9998;
+    }
+
+    #qrPopup {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1f2937;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      animation: slideUp 0.4s ease forwards;
+      color: white;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .qr-image {
+      width: 180px;
+      height: 180px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .wallet-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f0f0f0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      margin-left: 10px;
+      cursor: pointer;
+      color: #58B0C6;
+    }
+
+    .timer {
+      margin-top: 15px;
+      font-size: 18px;
+      color: red;
+      font-weight: bold;
+    }
+
+    #failedMsg {
+      display: none;
+      font-size: 18px;
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="fancy-header">
+    <div class="header-top">
+      <img src="LOGO.svg" alt="Logo" class="header-logo" />
+      <h1 class="header-title">DUMMY SMS</h1>
+    </div>
+    <div class="header-bottom">
+      <div class="profile-info">👤 Profile</div>
+      <div class="balance-info">💰 $0</div>
+    </div>
+  </header>
+
+  <div class="box">
+    <h2>Top Up</h2>
+    <input type="number" id="amount" placeholder="Enter amount in USD" oninput="checkAmount()" />
+    <div class="quick-buttons">
+      <button onclick="selectQuickAmount(10)">$10</button>
+      <button onclick="selectQuickAmount(20)">$20</button>
+      <button onclick="selectQuickAmount(30)">$30</button>
+      <button onclick="selectQuickAmount(40)">$40</button>
+      <button onclick="selectQuickAmount(50)">$50</button>
+    </div>
+    <div id="message" class="warning">❗ Minimum deposit is $10</div>
+
+    <div class="coin-selector">
+      <label>Select Coin</label>
+      <div class="custom-select-wrapper coin-select-wrapper">
+        <div class="selected-option" id="selectedCoin" onclick="toggleDropdown()">Select Coin</div>
+        <div class="custom-options" id="coinOptions">
+          <div onclick="selectCoin('usdt', 'USDT (Tether)', 'usdt.png')"><img src="usdt.png" /> USDT</div>
+          <div onclick="selectCoin('btc', 'Bitcoin', 'btc.png')"><img src="btc.png" /> BTC</div>
+          <div onclick="selectCoin('eth', 'Ethereum', 'eth.png')"><img src="eth.png" /> ETH</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="coin-selector" id="subCoinSection" style="display: none;">
+      <label>Select Network</label>
+      <div class="custom-select-wrapper network-select-wrapper">
+        <div class="selected-option" id="selectedSubCoin" onclick="toggleSubDropdown()">Select Network</div>
+        <div class="custom-options" id="subCoinOptions">
+          <div onclick="selectSubCoin('TRC20', 'TRC20 Network', 'trc.png')"><img src="trc.png" /> TRC20</div>
+          <div onclick="selectSubCoin('BEP20', 'BEP20 Network', 'bep20.png')"><img src="bep20.png" /> BEP20</div>
+           <div onclick="selectSubCoin('Ethereum', 'ERC NETWORK', 'eth.png')"><img src="eth.png" /> ERC</div>
+        </div>
+      </div>
+    </div>
+
+   <button class="continue-btn" id="continueBtn" onclick="goToNextPage()">Continue</button>
+ </div>
+
+  <div id="popupOverlay" onclick="closePopup()"></div>
+
+  <div id="qrPopup">
+    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+      <h3 style="margin: 0;">Pay Now</h3>
+      <button onclick="closePopup()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">✖</button>
+    </div>
+    <div id="solEstimate" style="margin-top: 10px; font-size: 24px; font-weight: bold; color: #fff;">0 SOL</div>
+    <div id="displayAmount" style="margin-top: 6px; color: #ffffff; font-weight: 500;">0$</div>
+
+    <img src="sol.png" alt="QR Code" class="qr-image" />
+    <div class="wallet-row">
+      <div class="wallet-address" id="walletAddress">0xABCD1234EFGH5678IJKL90MNOPQRST</div>
+      <button class="copy-btn" onclick="copyWallet()">📋</button>
+    </div>
+    <div class="timer" id="timer">05:00</div>
+    <div id="failedMsg">❌ Transaction Failed</div>
+  </div>
+
+  <script>
+let currentCoin = 'usdt'; // default
+let currentNetwork = "TRC20"; 
+
+    const coinDetails = {
+usdt: {
+    TRC20: { rate: 1, qr: "usdt_trc.png", symbol: "USDT (TRC20)"   , wallet: "TTTTTRC20WALLETADDRESS123",},
+    BEP20: { rate: 1, qr: "usdtbep.png", symbol: "USDT (BEP20)" ,wallet: "0xBEP20WALLETADDRESS456",},
+    Ethereum: { rate: 1, qr: "usdteth.png", symbol: "USDT (ERC20)" , wallet: "0xETHEREUMWALLET789",}
+  },
+  btc: { rate: 65000, qr: "btcqr.png", symbol: "BTC" ,wallet: "bc1BITCOINWALLETxyz123",},
+  eth: { rate: 3400, qr: "ethqr.png", symbol: "ETH" , wallet: "0xETHWALLETabc456",},
+  sol: { rate: 145, qr: "sol.png", symbol: "SOL" , wallet: "SoLANAWaLLeT098XYZ",},
+};
+    let countdown;
+    const timerDisplay = document.getElementById("timer");
+    const failedMsg = document.getElementById("failedMsg");
+
+function updateEstimate() {
+  const amount = parseFloat(document.getElementById("amount").value);
+  const selectedCoin = currentCoin || 'usdt'; // fallback
+  const rate = coinDetails[selectedCoin].rate;
+  const symbol = coinDetails[selectedCoin].symbol;
+  const solDiv = document.getElementById("solEstimate");
+
+  if (!isNaN(amount) && amount >= 1) {
+    const value = (amount / rate).toFixed(6);
+    solDiv.textContent = `≈ ${value} ${symbol}`;
+  } else {
+    solDiv.textContent = `≈ 0 ${symbol}`;
+  }
+}
+function checkAmount() {
+  const val = parseFloat(document.getElementById("amount").value);
+  const showBtn = document.getElementById("continueBtn");
+
+  let valid = !isNaN(val) && val >= 10 && currentCoin;
+  if (currentCoin === "usdt") {
+    valid = valid && currentNetwork;
+  }
+
+  showBtn.style.display = valid ? "block" : "none";
+  updateEstimate(); // also show updated estimated coin
+}
+
+
+function updateEstimate() {
+  const amount = parseFloat(document.getElementById("amount").value);
+  if (!isNaN(amount)) {
+    const rate = coinDetails[currentCoin].rate;
+    const symbol = coinDetails[currentCoin].symbol;
+    const estimate = (amount / rate).toFixed(6);
+    document.getElementById("solEstimate").textContent = `≈ ${estimate} ${symbol}`;
+  }
+}
+
+
+function goToNextPage() {
+  const amount = parseFloat(document.getElementById("amount").value);
+  if (isNaN(amount) || amount < 10) return;
+
+  let coinData;
+
+  if (currentCoin === "usdt") {
+    if (!coinDetails.usdt[currentNetwork]) {
+      alert("Please select a valid network for USDT.");
+      return;
+    }
+    coinData = coinDetails.usdt[currentNetwork];
+  } else {
+    coinData = coinDetails[currentCoin];
+  }
+
+  // Update QR and wallet
+  document.querySelector(".qr-image").src = coinData.qr;
+  document.getElementById("walletAddress").innerText = coinData.wallet;
+
+  // Update USD and estimated coin value
+  document.getElementById("displayAmount").textContent = `$${amount}`;
+  const est = (amount / coinData.rate).toFixed(6);
+  document.getElementById("solEstimate").textContent = `≈ ${est} ${coinData.symbol}`;
+
+  // Show popup
+  document.getElementById("qrPopup").style.display = "flex";
+  document.getElementById("popupOverlay").style.display = "block";
+
+  // Start countdown
+  startTimer();
+}
+
+
+function selectSubCoin(value, text, img) {
+  currentNetwork = value; // 🟢 Set selected network
+  document.getElementById("selectedSubCoin").innerHTML = `<img src="${img}" /> ${text}`;
+  document.getElementById("subCoinOptions").style.display = "none";
+}
+
+    function selectQuickAmount(val) {
+      document.getElementById("amount").value = val;
+      checkAmount();
+    }
+
+    function toggleDropdown() {
+      document.getElementById("coinOptions").style.display = "block";
+    }
+
+    function toggleSubDropdown() {
+      document.getElementById("subCoinOptions").style.display = "block";
+    }
+
+function selectCoin(value, text, img) {
+  currentCoin = value;
+  document.getElementById("selectedCoin").innerHTML = `<img src="${img}" /> ${text}`;
+  document.getElementById("coinOptions").style.display = "none";
+
+  if (value === "usdt") {
+    document.getElementById("subCoinSection").style.display = "block";
+  } else {
+    document.getElementById("subCoinSection").style.display = "none";
+    currentNetwork = null; // reset if not USDT
+  }
+
+  checkAmount(); // ✅ call here
+}
+
+
+
+    function closePopup() {
+      clearInterval(countdown);
+      document.getElementById("qrPopup").style.display = "none";
+      document.getElementById("popupOverlay").style.display = "none";
+      timerDisplay.style.display = "block";
+      failedMsg.style.display = "none";
+    }
+
+    function startTimer() {
+      let timeLeft = 300;
+      countdown = setInterval(() => {
+        let min = Math.floor(timeLeft / 60).toString().padStart(2, "0");
+        let sec = (timeLeft % 60).toString().padStart(2, "0");
+        timerDisplay.textContent = `${min}:${sec}`;
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          timerDisplay.style.display = "none";
+          failedMsg.style.display = "block";
+        }
+        timeLeft--;
+      }, 1000);
+    }
+
+    function copyWallet() {
+      const text = document.getElementById("walletAddress").innerText;
+      navigator.clipboard.writeText(text).then(() => alert("Copied!"));
+    }
+
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".coin-select-wrapper")) document.getElementById("coinOptions").style.display = "none";
+      if (!e.target.closest(".network-select-wrapper")) document.getElementById("subCoinOptions").style.display = "none";
+    });
+  </script>
+</body>
+</html>
